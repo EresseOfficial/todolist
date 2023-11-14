@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -58,7 +59,7 @@ class _TodoListState extends State<TodoList> {
                       usersCollection
                           .doc(user.uid)
                           .collection('tasks')
-                          .add({'taskName': taskController.text});
+                          .add({'taskName': taskController.text, 'isDone': false});
                       taskController.clear();
                     }
                   },
@@ -74,31 +75,36 @@ class _TodoListState extends State<TodoList> {
                   return CircularProgressIndicator();
                 }
 
-                List<String> tasks = snapshot.data!.docs
-                    .map((doc) => doc['taskName'].toString())
-                    .toList();
+                List<DocumentSnapshot> taskDocs = snapshot.data!.docs;
+                List<Widget> taskWidgets = [];
 
-                return ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(tasks[index]),
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          // Delete the task from Firestore
-                          usersCollection
-                              .doc(user.uid)
-                              .collection('tasks')
-                              .where('taskName', isEqualTo: tasks[index])
-                              .get()
-                              .then((querySnapshot) {
-                            querySnapshot.docs.first.reference.delete();
-                          });
+                for (int index = 0; index < taskDocs.length; index++) {
+                  DocumentSnapshot taskDoc = taskDocs[index];
+                  String taskName = taskDoc['taskName'].toString();
+                  bool isDone = taskDoc['isDone'];
+
+                  // Display the task and a checkbox
+                  taskWidgets.add(
+                    ListTile(
+                      title: Text(taskName),
+                      trailing: Checkbox(
+                        value: isDone,
+                        onChanged: (bool? newValue) {
+                          // Update the "isDone" field in Firestore
+                          taskDoc.reference.update({'isDone': newValue});
+                          if (newValue == true) {
+                            // Remove the task after 2 seconds
+                            Timer(Duration(seconds: 2), () {
+                              taskDoc.reference.delete();
+                            });
+                          }
                         },
                       ),
-                    );
-                  },
+                    ),
+                  );
+                }
+                return ListView(
+                  children: taskWidgets,
                 );
               },
             ),
