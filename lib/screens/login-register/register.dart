@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
 
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class Register extends StatefulWidget {
