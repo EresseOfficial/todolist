@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
+class TodoList extends StatefulWidget {
+  @override
+  _TodoListState createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList> {
+  // Reference to the Firestore collection where tasks will be stored
+  final CollectionReference tasksCollection =
+  FirebaseFirestore.instance.collection('tasks');
+
+  List<String> tasks = []; // List to store tasks
+  TextEditingController taskController = TextEditingController(); // Controller for task input
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Todo List"),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: taskController,
+                    decoration: InputDecoration(
+                      labelText: "Add a new task",
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    // Add the task to Firestore
+                    if (taskController.text.isNotEmpty) {
+                      tasksCollection.add({'taskName': taskController.text});
+                      taskController.clear();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: tasksCollection.snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return CircularProgressIndicator();
+                }
+
+                tasks = snapshot.data?.docs
+                    ?.map((doc) => doc['taskName'].toString())
+                    ?.toList() ?? [];
+
+                return ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(tasks[index]),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          // Delete the task from Firestore
+                          tasksCollection
+                              .where('taskName', isEqualTo: tasks[index])
+                              .get()
+                              .then((querySnapshot) {
+                            querySnapshot.docs.first.reference.delete();
+                          });
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      )
+    );
+  }
+}
