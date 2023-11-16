@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_list/screens/login-register/verify.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
+import 'package:todo_list/colors.dart';
 
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -122,7 +123,7 @@ class _RegisterState extends State<Register> {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   _errorMessage!,
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(color: ColorConstants.red),
                 ),
               ),
             Padding(

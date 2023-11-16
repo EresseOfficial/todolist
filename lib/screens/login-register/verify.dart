@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_list/screens/login-register/login.dart';
 import 'package:todo_list/screens/login-register/verify_successful.dart';
+import 'package:todo_list/colors.dart';
 
 class Verify extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -42,7 +43,7 @@ class Verify extends StatelessWidget {
         children: <Widget>[
           Icon(
             Icons.warning,
-            color: Colors.orange,
+            color: ColorConstants.orange,
             size: 100,
           ),
           Text(

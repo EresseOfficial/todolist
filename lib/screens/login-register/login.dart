@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_list/screens/login-register/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
+import 'package:todo_list/colors.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -92,7 +93,7 @@ class _LoginState extends State<Login> {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   _errorMessage!,
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(color: ColorConstants.red),
                 ),
               ),
             Padding(

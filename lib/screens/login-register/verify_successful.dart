@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
+import 'package:todo_list/colors.dart';
 
 class VerifySuccessful extends StatelessWidget {
   @override
@@ -14,7 +15,7 @@ class VerifySuccessful extends StatelessWidget {
           children: <Widget>[
             Icon(
               Icons.check_circle,
-              color: Colors.green,
+              color: ColorConstants.green,
               size: 100,
             ),
             Text(

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todo_list/screens/login-register/login.dart';
+import 'package:todo_list/colors.dart';
+
 
 class TodoList extends StatefulWidget {
   @override
@@ -48,7 +50,7 @@ class _TodoListState extends State<TodoList> {
               child: Text(
                 "Sign Out",
                 style: TextStyle(
-                  color: Colors.red, // Style the button with red color
+                  color: ColorConstants.red, // Style the button with red color
                 ),
               ),
             ),
