@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_list/screens/login-register/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:todo_list/screens/login-register/verify.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
 
 
@@ -38,16 +39,19 @@ class _RegisterState extends State<Register> {
       // Get the user ID
       String userId = userCredential.user?.uid ?? '';
 
+      // Send a verification email to the user
+      await userCredential.user?.sendEmailVerification();
+
       // Store additional user data in Firestore
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'email': _emailController.text,
         // Add other user data fields here
       });
 
-      // Registration successful, you can navigate to another screen or perform other actions
+      // Registration successful, navigate to the verification screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TodoList()),
+        MaterialPageRoute(builder: (context) => Verify()),
       );
 
       // Add a log statement here
@@ -204,7 +208,7 @@ class _RegisterState extends State<Register> {
                   MaterialPageRoute(builder: (context) => Login()),
                 );
               },
-              child: Text("Have an account? Login"),
+              child: Text("Have an account?"),
             ),
           ],
         ),

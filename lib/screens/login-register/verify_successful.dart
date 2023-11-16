@@ -18,7 +18,7 @@ class VerifySuccessful extends StatelessWidget {
               size: 100,
             ),
             Text(
-              'Email Verified!',
+              'Your account is ready to use!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
