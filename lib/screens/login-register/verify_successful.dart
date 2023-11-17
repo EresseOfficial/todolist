@@ -29,10 +29,7 @@ class VerifySuccessful extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 // Navigate to the TodoList screen or any other screen
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => TodoList()),
-                );
+                Navigator.pushReplacementNamed(context, '/todolist');
               },
               child: Text('Finish'),
             ),

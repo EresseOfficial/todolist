@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:todo_list/screens/login-register/login.dart';
 import 'package:todo_list/screens/login-register/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:todo_list/screens/login-register/verify.dart';
+import 'package:todo_list/screens/login-register/verify_successful.dart';
+import 'package:todo_list/screens/todolist/todolist.dart';
 import 'firebase_options.dart';
 import 'package:todo_list/colors.dart';
 
@@ -43,7 +47,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: ColorConstants.deepPurple),
         useMaterial3: true,
       ),
-      home: Register()
+      initialRoute: '/',
+      routes: {
+        '/': (context) => Register(),
+
+        '/auth/register': (context) => Register(),
+        '/auth/login': (context) => Login(),
+        '/auth/verify': (context) => Verify(),
+        '/auth/verify_successful': (context) => VerifySuccessful(),
+        '/todolist' : (context) => TodoList(),
+      },
     );
   }
 }

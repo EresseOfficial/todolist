@@ -50,10 +50,7 @@ class _RegisterState extends State<Register> {
         'email': _emailController.text,
       });
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Verify()),
-      );
+      Navigator.pushReplacementNamed(context, '/auth/verify');
 
       print('Registration successful for user ID: $userId');
     } catch (e) {
@@ -113,10 +110,7 @@ class _RegisterState extends State<Register> {
         password: _passwordController.text,
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => TodoList()), // Replace with your home page
-      );
+      Navigator.pushReplacementNamed(context, '/todolist');
 
       print('Login successful for user: ${_emailController.text}');
     } catch (e) {
@@ -282,9 +276,7 @@ class _RegisterState extends State<Register> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => Login()),
-                  );
+                  Navigator.pushReplacementNamed(context, '/auth/login');
                 },
                 child: Text("Have an account?"),
               ),

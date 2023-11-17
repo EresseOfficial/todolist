@@ -21,10 +21,7 @@ class _TodoListState extends State<TodoList> {
   // Function to sign out and navigate to the login page
   Future<void> _signOut() async {
     await _auth.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Login()), // Replace with your login page
-    );
+    Navigator.pushReplacementNamed(context, '/auth/login');
   }
 
   // Function to show a confirmation dialog

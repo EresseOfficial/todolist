@@ -52,10 +52,7 @@ class _LoginState extends State<Login> {
 
       // If login is successful, you can navigate to another screen or perform other actions.
       // For example, you can navigate to the TodoList screen here.
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => TodoList()), // Replace with your desired screen
-      );
+      Navigator.pushReplacementNamed(context, '/todolist');
       print('Login successful');
     } catch (e) {
       print('Error during login: $e');
@@ -147,9 +144,7 @@ class _LoginState extends State<Login> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => Register()),
-                );
+                Navigator.pushReplacementNamed(context, '/auth/register');
               },
               child: Text("Don't have an account?"),
             ),
