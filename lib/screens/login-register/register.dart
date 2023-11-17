@@ -67,7 +67,33 @@ class _RegisterState extends State<Register> {
 
       if (e is FirebaseAuthException) {
         if (e.code == 'email-already-in-use') {
-          errorMessage = 'Email already exists. Please use a different email.';
+          errorMessage = 'Email already exists. Do you want to log in instead?';
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Email Already Exists'),
+                content: Text(errorMessage),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => Login()),
+                      );
+                    },
+                    child: Text('Log in'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text('Cancel'),
+                  ),
+                ],
+              );
+            },
+          );
         }
       }
 
