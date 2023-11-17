@@ -46,6 +46,5 @@ The TodoList app provides a simple interface for managing your tasks:
 - Add a Task: To add a new task, tap the "+" button in the app.
 - Complete a Task: Tap the checkbox next to a task to mark it as complete. The task will be automatically deleted after 2 seconds.
 - View Your Tasks: Your tasks will be displayed in a scrollable list, with completed tasks marked as done.
-- Remove a Task: Completed tasks are automatically removed after 2 seconds. You can also manually delete a task by swiping it to the left.
 
 Enjoy using the TodoList app to stay organized and manage your tasks efficiently!
