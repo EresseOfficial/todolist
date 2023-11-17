@@ -6,7 +6,6 @@ import 'package:todo_list/screens/login-register/verify.dart';
 import 'package:todo_list/screens/todolist/todolist.dart';
 import 'package:todo_list/colors.dart';
 
-
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class Register extends StatefulWidget {
@@ -24,6 +23,11 @@ class _RegisterState extends State<Register> {
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
   String? _errorMessage;
+
+  // Password strength regex pattern
+  final RegExp passwordStrengthRegex = RegExp(
+    r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:;<>,.?/~]).{8,}$',
+  );
 
   Future<void> _registerUser() async {
     setState(() {
@@ -57,7 +61,6 @@ class _RegisterState extends State<Register> {
 
       // Add a log statement here
       print('Registration successful for user ID: $userId');
-
     } catch (e) {
       print('Error during registration: $e');
       String errorMessage = 'An error occurred during registration.';
@@ -90,8 +93,11 @@ class _RegisterState extends State<Register> {
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
     }
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!passwordStrengthRegex.hasMatch(value)) {
+      return 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.';
     }
     return null;
   }
@@ -135,6 +141,7 @@ class _RegisterState extends State<Register> {
                   border: OutlineInputBorder(),
                 ),
                 style: TextStyle(fontSize: 16),
+                keyboardType: TextInputType.emailAddress,
                 validator: _validateEmail,
               ),
             ),

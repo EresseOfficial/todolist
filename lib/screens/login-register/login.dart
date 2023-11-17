@@ -105,6 +105,7 @@ class _LoginState extends State<Login> {
                   border: OutlineInputBorder(),
                 ),
                 style: TextStyle(fontSize: 16),
+                keyboardType: TextInputType.emailAddress,
                 validator: _validateEmail,
               ),
             ),
