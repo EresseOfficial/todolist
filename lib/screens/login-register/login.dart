@@ -138,7 +138,7 @@ class _LoginState extends State<Login> {
                   _performLogin(); // Call the login method
                 }
               },
-              child: Text("Login"),
+              child: Text("Log in"),
               style: ButtonStyle(
                 padding: MaterialStateProperty.all(
                   EdgeInsets.symmetric(horizontal: 20, vertical: 12),

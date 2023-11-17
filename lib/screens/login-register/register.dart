@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:todo_list/screens/login-register/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,10 +25,11 @@ class _RegisterState extends State<Register> {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Password strength regex pattern
   final RegExp passwordStrengthRegex = RegExp(
     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:;<>,.?/~]).{8,}$',
   );
+
+  final ButtonController _buttonController = Get.put(ButtonController());
 
   Future<void> _registerUser() async {
     setState(() {
@@ -36,30 +38,23 @@ class _RegisterState extends State<Register> {
     });
 
     try {
-      // Create a user with email and password
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
           email: _emailController.text, password: _passwordController.text);
 
-      // Get the user ID
       String userId = userCredential.user?.uid ?? '';
 
-      // Send a verification email to the user
       await userCredential.user?.sendEmailVerification();
 
-      // Store additional user data in Firestore
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'email': _emailController.text,
-        // Add other user data fields here
       });
 
-      // Registration successful, navigate to the verification screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Verify()),
       );
 
-      // Add a log statement here
       print('Registration successful for user ID: $userId');
     } catch (e) {
       print('Error during registration: $e');
@@ -68,32 +63,33 @@ class _RegisterState extends State<Register> {
       if (e is FirebaseAuthException) {
         if (e.code == 'email-already-in-use') {
           errorMessage = 'Email already exists. Do you want to log in instead?';
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Email Already Exists'),
-                content: Text(errorMessage),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Login()),
-                      );
-                    },
-                    child: Text('Log in'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    child: Text('Cancel'),
-                  ),
-                ],
-              );
-            },
-          );
+          // showDialog(
+          //   context: context,
+          //   builder: (context) {
+          //     return AlertDialog(
+          //       title: Text('Email Already Exists'),
+          //       content: Text(errorMessage),
+          //       actions: [
+          //         TextButton(
+          //           onPressed: () {
+          //             Navigator.of(context).pop(); // Close the dialog
+          //             Navigator.of(context).pushReplacement(
+          //               MaterialPageRoute(builder: (context) => Login()),
+          //             );
+          //           },
+          //           child: Text('Log in'),
+          //         ),
+          //         TextButton(
+          //           onPressed: () {
+          //             Navigator.of(context).pop(); // Close the dialog
+          //           },
+          //           child: Text('Cancel'),
+          //         ),
+          //       ],
+          //     );
+          //   },
+          // );
+          _buttonController.changeToLoginState();
         }
       }
 
@@ -102,6 +98,42 @@ class _RegisterState extends State<Register> {
         _isLoading = false;
       });
       print('Registration failed: $errorMessage');
+    }
+  }
+
+  Future<void> _loginUser() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TodoList()), // Replace with your home page
+      );
+
+      print('Login successful for user: ${_emailController.text}');
+    } catch (e) {
+      print('Error during login: $e');
+      String errorMessage = 'An error occurred during login.';
+
+      if (e is FirebaseAuthException) {
+        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+          errorMessage = 'Invalid email or password. Please try again.';
+        }
+      }
+
+      setState(() {
+        _errorMessage = errorMessage;
+        _isLoading = false;
+      });
+      print('Login failed: $errorMessage');
     }
   }
 
@@ -144,109 +176,138 @@ class _RegisterState extends State<Register> {
       appBar: AppBar(
         title: Text("Register"),
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_errorMessage != null)
+      body: SingleChildScrollView( // Wrap with SingleChildScrollView
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_errorMessage != null)
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: 40,
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: ColorConstants.red),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  _errorMessage!,
-                  style: TextStyle(color: ColorConstants.red),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: "E-mail",
-                  border: OutlineInputBorder(),
-                ),
-                style: TextStyle(fontSize: 16),
-                keyboardType: TextInputType.emailAddress,
-                validator: _validateEmail,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
+                child: TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: "E-mail",
+                    border: OutlineInputBorder(),
                   ),
+                  style: TextStyle(fontSize: 16),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: _validateEmail,
                 ),
-                style: TextStyle(fontSize: 16),
-                obscureText: _obscurePassword,
-                validator: _validatePassword,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextFormField(
-                controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: "Confirm password",
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureConfirmPassword
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
                   ),
-                ),
-                style: TextStyle(fontSize: 16),
-                obscureText: _obscureConfirmPassword,
-                validator: _validateConfirmPassword,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!_isLoading) {
-                  if (_formKey.currentState!.validate()) {
-                    _registerUser(); // Call the registration method
-                  }
-                }
-              },
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Text("Register"),
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                  EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  style: TextStyle(fontSize: 16),
+                  obscureText: _obscurePassword,
+                  validator: _validatePassword,
                 ),
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => Login()),
-                );
-              },
-              child: Text("Have an account?"),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextFormField(
+                  controller: _confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: "Confirm password",
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  style: TextStyle(fontSize: 16),
+                  obscureText: _obscureConfirmPassword,
+                  validator: _validateConfirmPassword,
+                ),
+              ),
+              GetBuilder<ButtonController>(
+                builder: (_) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      if (!_isLoading) {
+                        if (_formKey.currentState!.validate()) {
+                          if (_buttonController.buttonText == "Register") {
+                            _registerUser();
+                          } else if (_buttonController.buttonText == "Log in") {
+                            _loginUser();
+                          }
+                        }
+                      }
+                    },
+                    child: _isLoading
+                        ? CircularProgressIndicator()
+                        : Text(_buttonController.buttonText),
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => Login()),
+                  );
+                },
+                child: Text("Have an account?"),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+class ButtonController extends GetxController {
+  RxString _buttonText = "Register".obs;
+
+  String get buttonText => _buttonText.value;
+
+  ButtonController() {
+    // Initialize the button text as "Register" when the controller is created.
+    _buttonText.value = "Register";
+  }
+
+  void changeToLoginState() {
+    _buttonText.value = "Log in";
+  }
+}
+
